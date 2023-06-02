@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  flexric:
+    image: flexric
+    container_name: Flexric
+    privileged: true
+    networks:
+      - flexric_connection
+    stdin_open: true 
+    tty: true
+    command: sh -c "sed -ie 's/127.0.0.1/'$(hostname -i)'/' flexric/flexric.conf && ./flexric/build/examples/ric/nearRT-RIC -c ./flexric/flexric.conf"
+  
+  cu:
+   image: flexric
+   container_name: Cu
+   privileged: true
+   networks:
+    - flexric_connection
+   stdin_open: true 
+   tty: true
+   command: sh -c "sed -ie 's/127.0.0.1/'$(nslookup Flexric | grep -o '.........2$')'/' flexric/flexric.conf && ./flexric/build/examples/emulator/agent/emu_agent_gnb_cu -c flexric/flexric.conf"
+   depends_on:
+     - flexric
+
+  du:
+   image: flexric
+   privileged: true
+   container_name: Du
+   networks:
+    - flexric_connection
+   stdin_open: true 
+   tty: true
+   command: sh -c "sed -ie 's/127.0.0.1/'$(nslookup Flexric | grep -o '.........2$')'/' flexric/flexric.conf && ./flexric/build/examples/emulator/agent/emu_agent_gnb_du -c flexric/flexric.conf"
+   depends_on:
+       - flexric
+
+  oai:
+   image: oai
+   privileged: true
+   container_name: Oai
+   networks:
+    - flexric_connection
+   stdin_open: true 
+   tty: true
+   command: sh -c "sed -ie 's/127.0.0.1/'$(nslookup Flexric | grep -o '.........2$')'/' ../usr/local/etc/flexric/flexric.conf && sudo oai/cmake_targets/ran_build/build/lte-softmodem -O flexric/multiRAT/oai/enb.band7.tm1.25PRB.usrpb210.replay.conf"      
+   depends_on:
+       - flexric
+   volumes:
+    - "/dev/bus/usb:/dev/bus/usb"    
+
+networks:
+  flexric_connection:
