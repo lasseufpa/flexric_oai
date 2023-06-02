@@ -1,0 +1,7 @@
+FROM flexric
+WORKDIR /home
+RUN sudo DEBIAN_FRONTEND=noninteractive add-apt-repository -y ppa:git-core/ppa && apt-get update && apt-get install -y git && git clone https://gitlab.eurecom.fr/oai/openairinterface5g.git oai && cd oai/ && git checkout 2022.41 && EMAIL=root@localhost git am ../flexric/multiRAT/oai/oai.patch --whitespace=nowarn && bash -c "source oaienv"
+WORKDIR /home/oai/cmake_targets
+RUN export BUILD_UHD_FROM_SOURCE=True && export UHD_VERSION=4.2.0.0 && DEBIAN_FRONTEND=noninteractive ./build_oai -I -w USRP -i && DEBIAN_FRONTEND=noninteractive ./build_oai --eNB --gNB -c -C -w USRP --ninja
+WORKDIR /home
+RUN python3 ../usr/local/lib/uhd/utils/uhd_images_downloader.py
