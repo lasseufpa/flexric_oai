@@ -1,6 +1,6 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 WORKDIR /home
 #Download of pending issues
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -yq dnsutils git sudo make cmake software-properties-common git wget git build-essential sudo psmisc vim
 #Installation
-RUN git clone https://github.com/LucasQCosta/FlexRIC-UFPA.git && cd FlexRIC-UFPA && git checkout v18.04 && cd .. && bash FlexRIC-UFPA/file.sh
+RUN git clone https://github.com/LucasQCosta/FlexRIC-UFPA.git && cd FlexRIC-UFPA && git checkout v20.04 && cd .. && bash FlexRIC-UFPA/file.sh
